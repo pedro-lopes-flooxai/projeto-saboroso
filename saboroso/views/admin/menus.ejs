@@ -189,7 +189,7 @@
             let data = JSON.parse(tr.dataset.row);
 
             
-            if (confirm(`Deseja realmente excluir o menu ${data.titlle}?`));
+            if (confirm(`Deseja realmente excluir o menu ${data.title}?`));
             fetch(`/admin/menus/${data.id}`, {
               method: 'DELETE'
            })
