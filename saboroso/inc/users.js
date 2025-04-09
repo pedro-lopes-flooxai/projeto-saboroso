@@ -14,7 +14,7 @@ login(email, password){
 
     return new Promise((resolve, reject)=>{
 
-        connect.query(`
+        conn.query(`
             SELECT * FROM tb_users WHERE email = ?
             `, [
                 email
