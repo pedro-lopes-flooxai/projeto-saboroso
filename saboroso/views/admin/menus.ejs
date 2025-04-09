@@ -177,7 +177,31 @@
 
       });
 
+      [...document.querySelectorAll('.btn-delete')].forEach(btn =>{
 
+          btn.addEventListener('click', e => {
+
+            let tr = e.path.find(el =>{
+
+              return (el.tagName.toUpperCase() === 'TR');
+            });
+            
+            let data = JSON.parse(tr.dataset.row);
+
+            
+            if (confirm(`Deseja realmente excluir o menu ${data.titlle}?`));
+            fetch(`/admin/menus/${data.id}`, {
+              method: 'DELETE'
+           })
+              .then(Response => response.json())
+              .then(json);
+
+
+                window.location.reload();
+          });
+
+
+      });
 
       [...document.querySelectorAll('.btn-update')].forEach(btn => {
 

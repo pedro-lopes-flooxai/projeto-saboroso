@@ -112,12 +112,25 @@ router.post("/menus", function(req, res, next){
         res.send(results);
 
     }).catch(err=>{
-        
+
         res.send(err);
 
     });
 
 });
+
+router.delete("/menus/:id", function(req, res, next){
+    menus.delete(req.params.id).then(result=>{
+
+        res.send(results);
+
+    }).catch(err=>{
+
+        res.send(err);
+
+    });
+
+})
 
 
 router.get("/reservations", function(req, res, next){
