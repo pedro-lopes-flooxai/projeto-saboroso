@@ -1,4 +1,6 @@
 var conn = require("./db")
+var Pagination = require ("./../inc/Pagination");
+var moment = require("moment");
 
 module.exports = {
 
@@ -75,25 +77,47 @@ module.exports = {
 
     },
 
-    getReservations(){ 
+    getReservations(req){ 
 
-        return new Promise((resolve, reject) => { 
-            
-            conn.query( `
-                SELECT * FROM tb_reservations ORDER BY date DESC
-            `, (err, results) => { 
+        return new Promise((resolve,reject)=>{
 
-        if (err) { 
-            reject(err);
-        } 
+            let page = req.query.page;
+            let dtstart = req.query.start;
+            let dtend = req.query.end;
 
-            resolve(results);
+        if (!page) page = 1;
 
-            }); 
-        }); 
-     },
+        let params = [];
+
+        if (dtstart && dtend) params.push(dtstart, dtend);
+
+        let pag = new Pagination(
+            `
+                SELECT SQL_CALC_FOUND_ROWS * 
+                FROM tb_reservations 
+               ${(dtstart && dtend) ? 'WHERE date BETWEEN ? AND ?' : ''} 
+                ORDER BY name LIMIT ?, ?
+            `,
+            [
+                dtstart,
+                dtend
+            ]
+        );
+      
+        pag.getPage(page).then(data => {
+
+            resolve({
+                data,
+                links: pag.getNavigation(req.query)
+            });
+
+        });
+    });
+
+},
      
      delete(id){
+
         return new Promise((resolve, reject)=>{
 
             conn.query(`
@@ -101,6 +125,7 @@ module.exports = {
                 `, [
                     id
                 ], (err, results)=>{
+
                     if (err) {
                         reject(err);
 
@@ -110,6 +135,77 @@ module.exports = {
                 })
 
         })
+     },
+
+     chart(req){
+        return new Promise((resolve, reject)=>{
+
+            conn.query(`
+                SELECT
+                CONCAT(YEAR(date),'-', MONTH(date)) AS date,
+                COUNT(*) AS total,
+                SUM(people) / COUNT(*) AS avg_people
+                FROM tb_reservations
+                WHERE 
+                date BETWEEN ? AND ?
+                GROUP BY YEAR(date) DEESC, MONTH(date) DESC
+                ORDER BY YEAR(date) DESC, MONTH(date) DESC;
+                `, [
+                    req.query.start,
+                    req.query.end
+                ], (err, results)=>{
+
+                    if(err){
+                        reject(err);
+                    } else {
+                        let months = [];
+                        let values = [];
+
+                        results.forEach(row=>{
+
+                            months.push(moment(row.date).format('MMM YYYY'));
+                            values.push(row.total);
+
+                        });
+
+                        resolve({
+                            months,
+                            values
+                        });
+                    }
+
+                });
+
+
+        });
+     },
+
+     dahshboard(){
+        return new Promise((resolve, reject)=>{
+
+            conn.query(`
+                
+            SELECT 
+            (SELECT COUNT(*) FROM tb_contacts) AS nrcontacts, 
+            (SELECT COUNT(*) FROM tb_menus) AS nrmenus, 
+            (SELECT COUNT(*) FROM tb_reservations) AS nrreservations, 
+            (SELECT COUNT(*) FROM tb_users) AS nrusers;
+                
+                `, (err, results)=>{
+
+                    if (err) {
+                        reject(err);
+                    } else {
+
+                        resolve(results[0]);
+                    }
+
+                });
+        })
      }
 
 };
+
+
+
+        

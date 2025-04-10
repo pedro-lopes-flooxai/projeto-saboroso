@@ -146,95 +146,34 @@
 
     <script src="/js/hcode-filteareder.js"></script>
     <script src="/js/hcode-formsave.js"></script>
+    <script src="/js/hcode-grid.js"></script>
     <script>
 
       new HcodeFileReader("#modal-create [type=file]", "#modal-create img");
       new HcodeFileReader("#modal-update [type=file]", "#modal-update img");
 
+      new HcodeGrid({
+        deleteUrl: '/admin/menus/${data.id}',
+        deleteMsg: 'Deseja Realmente excluir o menu ${data.title}?',
+        onUpdateLoad: (form, name, data) => {
 
-      let formCreate = documet.querySelector("#modal-create form");
+          let input = form.querySelector(`[name=${name}]`);
+  
+  switch (name){
 
-      formCreate.save().then(json=>{
+   
+   case 'photo':
+      form.querySelector("img").src = '/' + data[name];
+      break;
+    default:
 
-        window.location.reload();
-
-      }).catch(err => {
-
-        console.log(err);
-
-      })
-
+    if (input) input.value = data[name];
      
-      let formUpdate = document.querySelector("#modal-update form");
+  }
 
-      formUpdate.save().then(json=>{
-
-          window.location.reload();
-
-          }).catch(err => {
-
-          console.log(err);
-
+        }
       });
 
-      [...document.querySelectorAll('.btn-delete')].forEach(btn =>{
 
-          btn.addEventListener('click', e => {
-
-            let tr = e.path.find(el =>{
-
-              return (el.tagName.toUpperCase() === 'TR');
-            });
-            
-            let data = JSON.parse(tr.dataset.row);
-
-            
-            if (confirm(`Deseja realmente excluir o menu ${data.title}?`));
-            fetch(`/admin/menus/${data.id}`, {
-              method: 'DELETE'
-           })
-              .then(Response => response.json())
-              .then(json);
-
-
-                window.location.reload();
-          });
-
-
-      });
-
-      [...document.querySelectorAll('.btn-update')].forEach(btn => {
-
-        btn.addEventListener('click', e => {
-
-          e.path.find(el =>{
-
-            return (el.tagName.toUpperCase() === 'TR');
-
-          });
-
-          let data = JSON.parse (tr.dataset.row);
-
-          for (let name in data) {
-
-            switch (name){
-              case 'photo':
-                formUpdate.querySelector("img").src ='/'+ data [name];
-                
-              break;
-              default:
-                let input = formUpdate.querySelector(`[name=${name}]`);
-                formUpdate.querySelector(`[name=${name}]`).value = dat[name];
-            }
-
-            formUpdate.querySelector(`[name= ${name}]`).value = data(name);
-
-          }
-
-          $('#modal-update').modal('show');
-
-        });
-
-      });
 
     </script>

@@ -3,192 +3,304 @@ var users = require("./../inc/users");
 var admin = require("./../inc/admin");
 var menus = require ("./../inc/menus");
 var reservations = require("./../inc/reservations");
+var contacts = require ("./../inc/contacts");
+var emails = require ("./../inc/emails");
 var moment = require("moment");
+const { route } = require(".");
 var router = express.Router();
 
-moment.locale("pt-BR");
+module.exports = function(io){
 
-router.use(function(req, res, next){
+    moment.locale("pt-BR");
 
-    if(['/login'].indexOf(req.url) === -1 && !req.session.user) {
-        res.redirect("/admin/login");
-    } else {
+    router.use(function(req, res, next){
+    
+        if(['/login'].indexOf(req.url) === -1 && !req.session.user) {
+            res.redirect("/admin/login");
+        } else {
+            next();
+        }
+    
+    });
+    
+    router.use(function(req,res,next){
+    
+        req.menus = admin.getMenus(req);
+    
         next();
-    }
-
-});
-
-router.use(function(req,res,next){
-
-    req.menus = admin.getMenus(req);
-
-    next();
-
-});
-
-router.get("/logout", function(req, res, next){
-
-    delete req.session.user;
-
-    res.redirect("/admin/login");
-
-});
-
-
-router.get("/", function(req, res, next){
-
-    admin.dashboard().then(data => {
-
-        res.render("admin/index", admin.getParams(req, {
-            data
-         }));
-
-    }).catch(err => {
-
-        console.error(err);
-
+    
     });
-   
-      
-  
-});
-
-router.post("/login", function(req, res, next){
-
-    if (!req.body.email){
-
-        users.render(req, res, "Prencha o campo e-mail.");
-    } else if (!req.body.password){
-        users.render(req, res, "Preencha o campo senha");
-    } else {
-
-        users.login(req.body.small, req.body.password).then(user=>{
-
-            req.session.user = user;
-
-            res.redirect("/adimin");
-
-        }).catch(err =>{
-
-            users.render(req,res,err.message || err);
-
+    
+    router.get("/logout", function(req, res, next){
+    
+        delete req.session.user;
+    
+        res.redirect("/admin/login");
+    
+    });
+    
+    
+    router.get("/", function(req, res, next){
+    
+        admin.dashboard().then(data => {
+    
+            res.render("admin/index", admin.getParams(req, {
+                data
+             }));
+    
+        }).catch(err => {
+    
+            console.error(err);
+    
         });
-
-    }
-
-});
-
-router.get("/login", function(req, res, next){
-
-        users.render(req, res, null);
-
-});
-
-router.get("/contacts", function(req, res, next){
-
-    res.render("admin/contacts", admin.getParams(req));
-
-});
-
-router.get("/emails", function(req, res, next){
-
-    res.render("admin/emails", admin.getParams(req));
-
-});
-
-router.get("/menus", function(req, res, next){
-
-    menus.getMenus().then(data=>{
-
-        res.render("admin/menus", admin.getParams(req, {
-            data
-
-        }));
- 
+       
+          
+      
     });
-
-});
-
-router.post("/menus", function(req, res, next){
-
-    menus.save(req.fields, req.files).then(results=>{
-
-        res.send(results);
-
-    }).catch(err=>{
-
-        res.send(err);
-
+    
+    router.get("/dashboard", function(req,res,next){
+    
+        reservations.dashboard().then(data=>{
+    
+            res.send(data);
+        });
+    
     });
-
-});
-
-router.delete("/menus/:id", function(req, res, next){
-    menus.delete(req.params.id).then(result=>{
-
-        res.send(results);
-
-    }).catch(err=>{
-
-        res.send(err);
-
+    
+    router.post("/login", function(req, res, next){
+    
+        if (!req.body.email){
+    
+            users.render(req, res, "Prencha o campo e-mail.");
+        } else if (!req.body.password){
+            users.render(req, res, "Preencha o campo senha");
+        } else {
+    
+            users.login(req.body.small, req.body.password).then(user=>{
+    
+                req.session.user = user;
+    
+                res.redirect("/adimin");
+    
+            }).catch(err =>{
+    
+                users.render(req,res,err.message || err);
+    
+            });
+    
+        }
+    
     });
-
-})
-
-
-router.get("/reservations", function(req, res, next){
-
-    reservations.getReservations().then(data => {
+    
+    router.get("/login", function(req, res, next){
+    
+            users.render(req, res, null);
+    
+    });
+    
+    router.get("/contacts", function(req, res, next){
+    
+        contacts.getContacts().the(data=>{
+    
+            res.render("admin/contacts", admin.getParams(req,{
+                data
+            }));
+        });
+    });
+    
+    router.delete("/contacts/:id", function(req,res,next){
+        contacts.delete(req.params.id, io).then(results=>{
+            res.send(results);
+           io.emit('dahsboard update');
+        }).catch(err=>{
+            res.send(err);
+        })
+    });
+    
+    router.get("/emails", function(req, res, next){
+    
+        emails.getEmails().then(data=>{
+    
+            res.render("admin/emails", admin.getParams(req,{
+                data
+            }));
+    
+        });
+    
+        router.delete("/emails/:id", function(req,res,next){
+            emails.delete(req.params.id).then(results=>{
+                res.send(results);
+                io.emit('dahsboard update');
+            }).catch(err=>{
+                res.send(err);
+            })
+        });
         
     
-    res.render("admin/reservations", admin.getParams(req, {
-        date: {},
-        data,
-        moment
-
-        }));
+    });
+    
+    router.get("/menus", function(req, res, next){
+    
+        menus.getMenus().then(data=>{
+    
+            res.render("admin/menus", admin.getParams(req, {
+                data
+    
+            }));
+     
+        });
     
     });
-
-});
-
-router.post("/reservations", function(req, res, next){
-
-    reservations.save(req.fields, req.files).then(results=>{
-
-        res.send(results);
-
-    }).catch(err=>{
-
-        res.send(err);
-
+    
+    router.post("/menus", function(req, res, next){
+    
+        menus.save(req.fields, req.files).then(results=>{
+    
+            io.emit('dahsboard update');
+            res.send(results);
+    
+        }).catch(err=>{
+    
+            res.send(err);
+    
+        });
+    
     });
+    
+    router.delete("/menus/:id", function(req, res, next){
+        menus.delete(req.params.id).then(results=>{
 
-});
-
-router.delete("/reservations/:id", function(req, res, next){
-    reservations.delete(req.params.id).then(result=>{
-
-        res.send(results);
-
-    }).catch(err=>{
-
-        res.send(err);
-
+            io.emit('dahsboard update');
+            res.send(results);
+    
+        }).catch(err=>{
+    
+            res.send(err);
+    
+        });
+    
+    })
+    
+    
+    router.get("/reservations", function(req, res, next){
+    
+        let start = (req.query.start) ? req.query.start : moment().subtract(1,"year").format("YYYY-MM-DD");
+        let end = (req.query.end) ? req.query.end : moment().format("YYYY-MM-DD");
+        
+        reservations.getReservations(req).then(pag => {
+            
+        
+        res.render("admin/reservations", admin.getParams(req, {
+            date: {
+                start,
+                end
+            },
+            data: pag.data,
+            moment,
+            links: pag.links
+    
+            }));
+        
+        });
+    
     });
+    
+    router.get("/reservations/chart", function(req, res, next){
+    
+        req.query.start = (req.query.start) ? req.query.start : moment().subtract(1,"year").format("YYYY-MM-DD");
+        req.query.end = (req.query.end) ? req.query.end : moment().format("YYYY-MM-DD");
+    
+        reservations.chart(req).then(chartData=>{
+    
+            res.send(chartData);
+        });
+    });
+    
+    router.post("/reservations", function(req, res, next){
+    
+        reservations.save(req.fields, req.files).then(results=>{
+    
+            io.emit('dahsboard update');
+            res.send(results);
+    
+        }).catch(err=>{
+    
+            res.send(err);
+    
+        });
+    
+    });
+    
+    router.delete("/reservations/:id", function(req, res, next){
+        reservations.delete(req.params.id).then(result=>{
+    
+            io.emit('dahsboard update');
+            res.send(results);
+    
+        }).catch(err=>{
+    
+            res.send(err);
+    
+        });
+    
+    })
+    
+    
+    router.get("/users", function(req, res, next){
+    
+        users.getUsers().then(data => {
+    
+            res.render("admin/users", admin.getParams(req, {
+                data
+    
+            }));
+    
+        });
+    
+    });
+    router.post("/users", function(req, res, next){
+    
+        io.emit('dahsboard update');
+        users.save(req.fields).then(results=>{
+    
+            res.send(results);
+    
+        }).catch(err=>{
+    
+            res.send(err);
+    
+        });
+    });
+    
+    router.post("/users/password-change", function(req,res,next){
+    
+        users.changePassword(req).then(results=>{
+    
+            res.send(results);
+    
+        }).catch(err=>{
+    
+            res.send({
+                error: err
+            });
+    
+        });
+    });
+    
+    router.delete("/users/:id", function(req, res, next){
+    
+        io.emit('dahsboard update');
+        users.delete(req.params.id).then(results=>{
+    
+            res.send(results);
+    
+        }).catch(err=>{
+    
+            res.send(err);
+            
+        });
+    });
+    
 
-})
-
-
-router.get("/users", function(req, res, next){
-
-    res.render("admin/users", admin.getParams(req));
-
-});
-
-
-
-
-
-module.exports = router;
+    return router;
+}

@@ -38,10 +38,10 @@ module.exports = {
 
             if (files.photo.name) {
 
-                queryPhoto = 'photo = ?';
+                queryPhoto = ',photo = ?';
 
                 params.push(fields.photo);
-
+ 
             }
 
             if (parseInt(fields.id) > 0){
@@ -53,7 +53,7 @@ module.exports = {
                     SET title = ?,
                     description = ?,
                     price = ?,
-                    photo = ?,
+                    ${queryPhoto}
                 WHERE id = ?
                 `;
                                
@@ -75,9 +75,7 @@ module.exports = {
 
                  if(err) {
                     reject(err);
-
                  } else {
-
                     resolve(results);
 
                  }
