@@ -78,7 +78,7 @@ module.exports = {
 
         menus.map(menu=>{
 
-            if (menu.href === any `/admin ${Request.url}`) menu.active = true;
+            if (menu.href === `/admin ${Request.url}`) menu.active = true;
 
         });
 
