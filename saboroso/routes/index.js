@@ -1,4 +1,4 @@
-var conn = require('./../inc;db');
+var conn = require('./../inc/db');
 var express = require('express');
 var menus = require('./../inc/menus');
 var reservations = require('./../inc/reservations');
@@ -42,7 +42,7 @@ router.post('/contacts', function(req, res, next) {
 
       req.body = {};
 
-      io.emit('dahsboard update');
+      io.emit('dashboard update');
 
       contacts.render (req, res, null, "Contato enviado com sucesso");
 
@@ -94,7 +94,7 @@ router.post('/reservations', function(req, res, next) {
 
       req.body = {};
 
-      io.emit('dahsboard update');
+      io.emit('dashboard update');
       
     reservations.render(req, res, null, "Reserva realizada com sucesso");
 

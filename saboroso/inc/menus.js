@@ -1,6 +1,3 @@
-const { RedisStore } = require('connect-redis');
-const { connect } = require('../routes');
-
 let conn = require('./db'); 
 let path = require('path');
 
@@ -27,7 +24,7 @@ module.exports = {
 
         return new Promise((resolve, reject)=>{
 
-            fields.photo =  `image/${path.parse(files.photo.path).base}`;
+            fields.photo =  `images/${path.parse(files.photo.path).base}`;
 
             let query, queryPhoto='', params = [
                 fields.title,
@@ -52,7 +49,7 @@ module.exports = {
                     UPDATE tb_menus
                     SET title = ?,
                     description = ?,
-                    price = ?,
+                    price = ?
                     ${queryPhoto}
                 WHERE id = ?
                 `;

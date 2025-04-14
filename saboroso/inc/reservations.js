@@ -1,5 +1,5 @@
 var conn = require("./db")
-var Pagination = require ("./../inc/Pagination");
+var Pagination = require ("./Pagination");
 var moment = require("moment");
 
 module.exports = {
@@ -148,8 +148,8 @@ module.exports = {
                 FROM tb_reservations
                 WHERE 
                 date BETWEEN ? AND ?
-                GROUP BY YEAR(date) DEESC, MONTH(date) DESC
-                ORDER BY YEAR(date) DESC, MONTH(date) DESC;
+                GROUP BY CONCAT(YEAR(date), '-' ,
+                 MONTH(date)) ORDER BY date DESC;
                 `, [
                     req.query.start,
                     req.query.end
@@ -180,7 +180,7 @@ module.exports = {
         });
      },
 
-     dahshboard(){
+     dashboard(){
         return new Promise((resolve, reject)=>{
 
             conn.query(`

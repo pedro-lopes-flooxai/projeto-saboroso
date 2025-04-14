@@ -6,7 +6,6 @@ var reservations = require("./../inc/reservations");
 var contacts = require ("./../inc/contacts");
 var emails = require ("./../inc/emails");
 var moment = require("moment");
-const { route } = require(".");
 var router = express.Router();
 
 module.exports = function(io){
@@ -71,16 +70,16 @@ module.exports = function(io){
     
         if (!req.body.email){
     
-            users.render(req, res, "Prencha o campo e-mail.");
+            users.render(req, res, "Preencha o campo e-mail.");
         } else if (!req.body.password){
             users.render(req, res, "Preencha o campo senha");
         } else {
     
-            users.login(req.body.small, req.body.password).then(user=>{
+            users.login(req.body.email, req.body.password).then(user=>{
     
                 req.session.user = user;
     
-                res.redirect("/adimin");
+                res.redirect("/admin");
     
             }).catch(err =>{
     
@@ -100,18 +99,18 @@ module.exports = function(io){
     
     router.get("/contacts", function(req, res, next){
     
-        contacts.getContacts().the(data=>{
+        contacts.getContacts().then((data=>{
     
             res.render("admin/contacts", admin.getParams(req,{
                 data
             }));
-        });
+        }));
     });
     
     router.delete("/contacts/:id", function(req,res,next){
-        contacts.delete(req.params.id, io).then(results=>{
+        contacts.delete(req.params.id).then(results=>{
             res.send(results);
-           io.emit('dahsboard update');
+           io.emit('dashboard update');
         }).catch(err=>{
             res.send(err);
         })
@@ -130,7 +129,7 @@ module.exports = function(io){
         router.delete("/emails/:id", function(req,res,next){
             emails.delete(req.params.id).then(results=>{
                 res.send(results);
-                io.emit('dahsboard update');
+                io.emit('dashboard update');
             }).catch(err=>{
                 res.send(err);
             })
@@ -156,7 +155,7 @@ module.exports = function(io){
     
         menus.save(req.fields, req.files).then(results=>{
     
-            io.emit('dahsboard update');
+            io.emit('dashboard update');
             res.send(results);
     
         }).catch(err=>{
@@ -170,7 +169,7 @@ module.exports = function(io){
     router.delete("/menus/:id", function(req, res, next){
         menus.delete(req.params.id).then(results=>{
 
-            io.emit('dahsboard update');
+            io.emit('dashboard update');
             res.send(results);
     
         }).catch(err=>{
@@ -220,7 +219,7 @@ module.exports = function(io){
     
         reservations.save(req.fields, req.files).then(results=>{
     
-            io.emit('dahsboard update');
+            io.emit('dashboard update');
             res.send(results);
     
         }).catch(err=>{
@@ -232,16 +231,16 @@ module.exports = function(io){
     });
     
     router.delete("/reservations/:id", function(req, res, next){
-        reservations.delete(req.params.id).then(result=>{
+        reservations.delete(req.params.id).then((results=>{
     
-            io.emit('dahsboard update');
+            io.emit('dashboard update');
             res.send(results);
     
         }).catch(err=>{
     
             res.send(err);
     
-        });
+        }));
     
     })
     
@@ -260,7 +259,7 @@ module.exports = function(io){
     });
     router.post("/users", function(req, res, next){
     
-        io.emit('dahsboard update');
+        io.emit('dashboard update');
         users.save(req.fields).then(results=>{
     
             res.send(results);
@@ -289,7 +288,7 @@ module.exports = function(io){
     
     router.delete("/users/:id", function(req, res, next){
     
-        io.emit('dahsboard update');
+        io.emit('dashboard update');
         users.delete(req.params.id).then(results=>{
     
             res.send(results);

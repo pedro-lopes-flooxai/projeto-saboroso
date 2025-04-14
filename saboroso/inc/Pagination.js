@@ -2,7 +2,7 @@ let conn = require("./db");
 
 class Pagination { 
 
-    construct (
+    constructor (
         query,
         params = [],
         itensPerPage = 10
@@ -11,8 +11,6 @@ class Pagination {
         this.query = query;
         this.params = params;
         this.itensPerPage = itensPerPage;
-        this.currentPage = 1;
-
 
     }
 
@@ -25,9 +23,9 @@ class Pagination {
             this.itensPerPage
         );
 
-        return new Promise((resolve, rejct)=>{
+        return new Promise((resolve, reject)=>{
 
-        conn.query([this.query, "SELECT FOUND_ROWS() AS FOUND_ROWS"].join(";"), this.params, (err, resultados)=>{
+        conn.query([this.query, "SELECT FOUND_ROWS() AS FOUND_ROWS"].join(";"), this.params, (err, results)=>{
 
             if (err){
                 reject(err);
@@ -66,7 +64,7 @@ class Pagination {
         let nrend = 0;
 
         if (this.getTotalPages()< limitPageNav) {
-            limitPagesNav = this.getTotalPages();
+            limitPageNav = this.getTotalPages();
         }
 
         //primeiras pgs
@@ -81,7 +79,7 @@ class Pagination {
             nrend = this.getCurrentPage() + parseInt(limitPageNav/2);
         }
 
-        if (this.currentPage() > 1) {
+        if (this.getCurrentPage() > 1) {
             links.push({
                 text: '<',
                 href: '?'+ this.getQueryString(Object.assign({}, params, {
@@ -128,4 +126,4 @@ class Pagination {
 }
 
 
-mosules.ixports = Pagination;
+module.exports = Pagination;

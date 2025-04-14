@@ -1,4 +1,4 @@
-const e = require("express");
+var conn = require("./db");
 
 module.exports = {
 
@@ -26,18 +26,18 @@ login(email, password){
 
                 } else {
 
-                    if (results.length > 0) {
+                    if (!results.length > 0) {
                         reject("Usuário ou senha incorretos");
                     } else {
-
                         let row = results[0];
-
-                        if (row.password !== password){
+                    
+                        if (row.password !== password) {
                             reject("Usuário ou senha incorretos");
                         } else {
                             resolve(row);
                         }
                     }
+                    
                 }
 
             });
@@ -81,7 +81,7 @@ getUsers(){
                 query = `
                     UPDATE tb_users
                     SET name = ?,
-                        email = ?,
+                        email = ?
                     WHERE id = ?
                 `;
                                
@@ -92,7 +92,7 @@ getUsers(){
                 VALUES(?,?,?)
                 `;
                 
-                params.push(files.password);
+                params.push(fields.password);
 
             }
 

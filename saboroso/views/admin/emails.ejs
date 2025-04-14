@@ -37,7 +37,7 @@
                                     <td><%= row.email %></td>
                                     <td><button type="button" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash"></i> Excluir</button></td>
                                 </tr>
-                                <% }) >
+                                <% }); %>
                             </tbody>
                         </table>
                     </div>
@@ -57,7 +57,7 @@
 
 new HcodeGrid({
   deleteUrl:'/admin/emails/${data.id}',
-  deleteMsg: 'Deseja realmente excluir o e-mail ${data.name}?'
+  deleteMsg: 'Deseja realmente excluir o e-mail ${data.email}?'
 
 });
 

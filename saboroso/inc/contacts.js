@@ -1,8 +1,8 @@
 var conn = require("./db");
 
-moodule.exports = {
+module.exports = {
 
-    render(req, res, error, succes){
+    render(req, res, error, success){
 
         res.render('contacts', {
             title: 'Contato - Restaurante Saboroso!',
@@ -26,7 +26,7 @@ moodule.exports = {
                             fields.name,
                             fields.email,
                             fields.message
-                    ], (err, rsults)=>{
+                    ], (err, results)=>{
 
                         if (err) {
 
