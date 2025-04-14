@@ -31,7 +31,7 @@ app.use(function(req, res, next){
 
   if (req.method === 'POST'){
 
-  var form = formidable.IncomingForm({
+  var form = new formidable.IncomingForm({
       uploadDir:path.join(__dirname, "/public/images"),
       keepExtensions:true
 
