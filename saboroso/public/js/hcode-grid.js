@@ -101,7 +101,7 @@ getTrData(e){
 
 btnUpdateClick(e){
 
-  this.fireEvent('beforeUpdateCLick',[e]);
+  this.fireEvent('beforeUpdateClick',[e]);
   
   let data = this.getTrData(e);
 
@@ -111,7 +111,7 @@ btnUpdateClick(e){
 
   }
   
-  this.fireEvent('afterUpdateCLick',[e]);
+  this.fireEvent('afterUpdateClick',[e]);
 
 }
 

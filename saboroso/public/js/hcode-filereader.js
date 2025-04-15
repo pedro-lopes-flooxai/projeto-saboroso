@@ -1,4 +1,4 @@
-class HcodeFilReader{
+class HcodeFileReader{
 
     constructor(inputEl, imgEl){
 
@@ -10,7 +10,7 @@ class HcodeFilReader{
     }
 
     InitInputEvent(){
-        docucument.querySelector(this.inputEl).addEventListener("change", e=>{
+        document.querySelector(this.inputEl).addEventListener("change", e=>{
 
             this.reader(e.target.files[0]).then(result => {
 
