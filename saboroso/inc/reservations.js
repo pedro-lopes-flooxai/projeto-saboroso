@@ -98,10 +98,7 @@ module.exports = {
                ${(dtstart && dtend) ? 'WHERE date BETWEEN ? AND ?' : ''} 
                 ORDER BY name LIMIT ?, ?
             `,
-            [
-                dtstart,
-                dtend
-            ]
+           params
         );
       
         pag.getPage(page).then(data => {

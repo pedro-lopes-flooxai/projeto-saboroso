@@ -16,7 +16,7 @@ constructor(configs){
 
         window.location.reload();
 
-      },
+      }, 
       afterFormUpdate: (e) => {
 
         window.location.reload();
@@ -31,7 +31,7 @@ constructor(configs){
 
     },configs.listeners);
 
-    this.options = Object,assign({},{
+    this.options = Object.assign({},{
         formCreate: '#modal-create form', 
         formUpdate: '#modal-update form',
         btnUpdate:'btn-update',
@@ -46,8 +46,8 @@ constructor(configs){
 
       this.rows = [...document.querySelectorAll('table tbody tr')];
 
-      this.initForms(); 
-      this.initButtons();
+      this.InitForms(); 
+      this.InitButtons();
 
 }
 
@@ -89,13 +89,13 @@ fireEvent(name, args){
 
 getTrData(e){
 
-  let tr = e.path.find(el =>{
+  let tr = e.composedPath().find((el) =>{
   
-    return (el.tagName.toUpperCase() === 'TR');
+    return el.tagName.toUpperCase() === 'TR';
 
   });
 
-  return JSON.parse (tr.dataset.row);
+  return JSON.parse(tr.dataset.row);
 
 }
 
@@ -103,7 +103,7 @@ btnUpdateClick(e){
 
   this.fireEvent('beforeUpdateCLick',[e]);
   
-  let date = this.getTrData(e);
+  let data = this.getTrData(e);
 
   for (let name in data) {
 
@@ -119,32 +119,30 @@ btnDeleteClick(e){
 
   this.fireEvent('beforeDeleteClick');
 
-    let date = this.getTrData(e);
+    let data = this.getTrData(e);
     
     if (confirm(eval('`'+ this.options.deleteMsg + '`'))) {
 
     fetch(eval('`' + this.options.deleteUrl + '`'), {
-      method: 'DELETE'
+      method: 'DELETE',
    })
-      .then(Response => response.json())
-      .then(json => {
+      .then((response) => response.json())
+      .then((json) => {
 
-        this.fireEvent('afterDeleteClick');
+        this.fireEvent('afterDeleteClick', [e]);
+      });
 
-          
-          });
-
-        }
+    }
 
 }
 
 InitButtons(){
 
-  this.rows.forEach(row => {
+  this.rows.forEach((row) => {
 
-   [... row.querySelectorAll('.btn')].forEach(btn =>{
+   [... row.querySelectorAll('.btn')].forEach((btn) =>{
 
-          btn.addEventListener('click', e =>{
+          btn.addEventListener('click', (e) =>{
 
             if (e.target.classList.contains(this.options.btnUpdate)) {
 
